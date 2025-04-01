@@ -587,7 +587,7 @@ void shader_core_stats::print(FILE *fout) const {
     thread_icount_uarch += m_num_sim_insn[i];
     warp_icount_uarch += m_num_sim_winsn[i];
   }
-  fprintf(fout, "bypassed load instructions: %d\n",load_bypasses);
+  fprintf(fout, "bypassed load instructions: %d\n",ld_bypass_cnt);
   fprintf(fout, "gpgpu_n_tot_thrd_icount = %lld\n", thread_icount_uarch);
   fprintf(fout, "gpgpu_n_tot_w_icount = %lld\n", warp_icount_uarch);
 
@@ -2040,10 +2040,10 @@ bool ldst_unit::memory_cycle(warp_inst_t &inst,
   const mem_access_t &access = inst.accessq_back();
 
   bool bypassL1D = false;
-  bool load_limit = (inst.is_load() && access.get_addr()>= 0xc0000000 && access.get_addr()<= 0xc00fffff);//Programming_Assignment_3
-  if (CACHE_GLOBAL == inst.cache_op || (m_L1D == NULL)||load_limit/*Programming Assignment_3*/) {
-    if(load_limit){
-    m_stats->load_bypasses++;
+  bool ld_limit = (inst.is_load() && access.get_addr()>= 0xc0000000 && access.get_addr()<= 0xc00fffff);//PA3
+  if (CACHE_GLOBAL == inst.cache_op || (m_L1D == NULL)|| ld_limit/*PA3*/) {
+    if(ld_limit){
+    m_stats->ld_bypass_cnt++;
     bypassL1D = true;}
   } else if (inst.space.is_global()) {  // global memory access
     // skip L1 cache if the option is enabled
@@ -2588,8 +2588,8 @@ void ldst_unit::cycle() {
                                       // on load miss only
 
         bool bypassL1D = false;
-	bool load_limit = (mf->get_inst().is_load() && mf->get_addr()>=0xc0000000 && mf->get_addr()<=0xc00fffff);//Programming_Assignment_3
-        if (CACHE_GLOBAL == mf->get_inst().cache_op || (m_L1D == NULL)||load_limit/*Programming_Assignment_3*/) {
+	bool ld_limit = (mf->get_inst().is_load() && mf->get_addr()>=0xc0000000 && mf->get_addr()<=0xc00fffff);//PA3: Add the ranges
+        if (CACHE_GLOBAL == mf->get_inst().cache_op || (m_L1D == NULL)||ld_limit/*PA3*/) {
           bypassL1D = true;
         } else if (mf->get_access_type() == GLOBAL_ACC_R ||
                    mf->get_access_type() ==

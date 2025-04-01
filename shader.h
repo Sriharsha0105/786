@@ -1678,7 +1678,7 @@ struct shader_core_stats_pod {
   int gpgpu_n_mem_read_global;
   int gpgpu_n_mem_write_global;
   int gpgpu_n_mem_read_inst;
-  int load_bypasses=0;//Programming_Assignment_3
+  int ld_bypass_cnt=0;//PA3
   int gpgpu_n_mem_l2_writeback;
   int gpgpu_n_mem_l1_write_allocate;
   int gpgpu_n_mem_l2_write_allocate;
